@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <script
+      src="//static.filestackapi.com/filestack-js/3.x.x/filestack.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <button id="upload">Upload file</button>
+    <div id="result" style="width:800;height:600;padding:10px;border: 1px solid red; background-color: #aaa;">
+
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const client = filestack.init('APEkwxKMZTsWNIP0XQsv2z');
+        const options = {
+          storeTo: {
+            workflows: ['d9e2c79e-a748-42a1-9bf5-b45135e35ef7'],
+          },
+          onUploadDone: () => {
+            document.querySelector('#result').innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;color:red"> Waiting for results ...</div>'
+          }
+        };
+
+        picker = client.picker(options);
+
+        document.querySelector('#upload').addEventListener('click', () => {
+          picker.open();
+        });
+
+        const socket = io();
+
+        socket.on('result', (res) => {
+          const img = document.createElement('img');
+          console.log(res.data.url);
+          img.src = res.data.url;
+
+          const resDiv = document.querySelector('#result');
+          resDiv.innerHTML = '';
+          resDiv.appendChild(img);
+        })
+      });
+    </script>
+  </body>
+</html>
